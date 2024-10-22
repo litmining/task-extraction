@@ -1,0 +1,3 @@
+`nv_pmc_id.txt`: Pass this `.txt` file through pubget to run a query. it's all the articles that are associated with a neurovault collection from julios search (he did various things to link articles w/ collections)
+`nv_collections.csv`: this is a pre-processed version of the latest neurovault dump (2024-10-15). note that collections are not directly associated with cognitive atlas tasks. 
+`nv_collections_images.csv`: these are theimages nested within collections which are associated with cognitive atlas tasks
