@@ -1,0 +1,2 @@
+`neurovault_like_labels_alice.json`: Labels that Alice used to annotate neurovault collections ([Source](https://github.com/litmining/labelbuddy-annotations/blob/main/projects/semiauto_ma_features/labels/neurovault-like-labels.json))
+`annotations.json`: Annotations for the neurovault collections.
