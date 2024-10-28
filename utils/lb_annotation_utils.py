@@ -10,6 +10,9 @@ os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ann = json.load(open('./data/labelbuddy_annotations/nv_collection/annotations.json'))
 #%%
 class Article():
+    '''
+    A class to parse and extract sections from scientific article annotations.
+    '''
     def __init__(self, annotation: dict):
         
         #self.subheaders = get_subheaders(body)
