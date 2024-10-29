@@ -7,6 +7,7 @@ import sys
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from cognitiveatlas.api import get_task
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Define constants
@@ -29,58 +30,6 @@ while True:
         break
     except OverflowError:
         maxInt = int(maxInt / 10)
-
-
-def read_csv_data(
-    csv_file: str, chunk_size: int = 1000, max_rows: Optional[int] = None
-) -> Dict[str, str]:
-    """
-    Read CSV data from file in chunks.
-
-    Args:
-        csv_file: Path to CSV file.
-        chunk_size: Number of rows to read per chunk (default: 1000).
-        max_rows: Maximum number of rows to read (default: None).
-    Returns:
-        Dictionary of CSV data keyed by PMID.
-    """
-    csv_data = {}
-    # Reset file pointer to start
-    file.seek(0)
-    for chunk_idx in range(0, max_rows, chunk_size):
-        with open(csv_file, "r") as file:
-            # Get header
-            header = next(csv.reader(file))
-
-            csv_reader = csv.reader(file)
-            next(csv_reader)  # Skip header again
-
-            chunk = []
-            total_rows = 0
-
-        for i, row in enumerate(csv_reader):
-            if max_rows and total_rows >= max_rows:
-                break
-
-            chunk.append(row)
-            if len(chunk) >= chunk_size:
-                # Process the chunk
-                for row in chunk:
-                    pmid, *fields = row
-                    csv_data[pmid] = dict(zip(header, row))
-                    total_rows += 1
-                    if max_rows and total_rows >= max_rows:
-                        break
-                chunk = []  # Clear the chunk
-
-        # Process any remaining rows in the last chunk
-        for row in chunk:
-            pmid, *fields = row
-            csv_data[pmid] = dict(zip(header, row))
-            total_rows += 1
-
-        print(f"Processed {total_rows} rows in total")
-    return csv_data
 
 
 def read_csv_chunk(
@@ -127,6 +76,9 @@ def read_csv_chunk(
 
 
 def pmcid_map_file_add_index(index_file: str, pmcid: str, add_location: str):
+    '''
+    Add a new entry to the index file for a given PMCID.
+    '''
     if not os.path.exists(index_file):
         with open(index_file, "w") as file:
             json.dump({}, file)
@@ -141,6 +93,9 @@ def pmcid_map_file_add_index(index_file: str, pmcid: str, add_location: str):
 
 
 def pmcid_map_file_get_index(index_file: str, pmcid: str):
+    '''
+    Get the index of a given PMCID from the index file.
+    '''
     with open(index_file, "r") as file:
         index_map = json.load(file)
         return index_map[pmcid]
@@ -153,6 +108,9 @@ def process_chunk(
     index_file: str = INDEX_FILE,
     task_file_pattern: str = TASK_FILE_PATTERN,
 ):
+    '''
+    Process a chunk of the CSV file and extract the NeuroVault labeled tasks.
+    '''
     csv_data = read_csv_chunk(
         csv_file, chunk_size=chunk_size, chunk_number=chunk_number
     )
