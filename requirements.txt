@@ -1,0 +1,14 @@
+openai
+transformers
+torch
+typing
+numpy
+requests
+pydantic
+langchain-core
+pandas
+psycopg2-binary
+cognitiveatlas
+langchain
+tiktoken
+black
