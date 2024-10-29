@@ -1,4 +1,3 @@
-#%% 
 import json
 import re
 from typing import List
@@ -8,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Example
 ann = json.load(open('./data/labelbuddy_annotations/nv_collection/annotations.json'))
-#%%
+
 class Article():
     '''
     A class to parse and extract sections from scientific article annotations.
@@ -24,9 +23,41 @@ class Article():
         self.title = self.get_header_section('title')
         self.keywords = self.get_header_section('keywords')
         self.methods = self.get_methods()
+        self.doi = annotation['metadata']['doi']
+        self.type = self.get_type()
+        self.pmcid = annotation['metadata']['pmcid']
+        self.pmid = annotation['metadata']['pmid']
         if self.methods == None:
             self.methods = "No explicit methods section"
+        
+        # Add a new LLM attribute class
+        class LLM:
+            def __init__(self):
+                self.cognitive_task = None
+                self.cognitive_task_description = None
+        self.llm = LLM()
 
+    def get_type(self):
+        '''
+        Get the type of article.
+        '''
+        # Check if meta-analysis
+        pattern = r"meta-analysis"
+        if re.search(pattern, self.title.lower()):
+            return "meta-analysis"
+        elif re.search(pattern, self.abstract.lower()):
+            return "meta-analysis"
+        
+        # Check if resting state fMRI
+        pattern = r"(resting-state|resting state)"
+        if re.search(pattern, self.title.lower()):
+            return "resting_state"
+        elif re.search(pattern, self.abstract.lower()):
+            return "resting_state"
+        
+        else:
+            return "fMRI"
+    
     def get_headers(self) -> List:
         '''
         Extract the body text from an annotation dictionary.
@@ -100,17 +131,6 @@ class Article():
             else: continue
         return None
 
-# Example 1: No explicit methods section
-article = Article(ann[0])
-print(article.methods)
-
-# Example 2: Explicit methods section
-article = Article(ann[1])
-print(article.methods)
-
-# Example 3: Abstract
-print(article.abstract)
-#%%
 # Get labels and annotated text from annotation.json
 def extract_annotated_text(full_text, start_char, end_char):
     """
@@ -156,7 +176,17 @@ def get_labels_and_annotated_text(annotation:dict)->dict:
             output['annotations'][label_name].append(extracted_text)
     return output
 
-# Example:
-labels = get_labels_and_annotated_text(ann[0])
-print(labels)
-#%%
+if __name__ == '__main__':
+    # Example 1: No explicit methods section
+    article = Article(ann[0])
+    print(article.methods)
+
+    # Example 2: Explicit methods section
+    article = Article(ann[1])
+    print(article.methods)
+
+    # Example 3: Abstract
+    print(article.abstract)
+    # Example:
+    labels = get_labels_and_annotated_text(ann[0])
+    print(labels)
